@@ -1,0 +1,220 @@
+.instructor-dashboard {
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+.instructor-header h1 {
+    font-size: 2.5rem;
+    color: #1e293b;
+}
+
+.instructor-header p {
+    color: #64748b;
+    max-width: 500px;
+}
+
+.btn-create-course {
+    background-color: #0369a1;
+    color: white;
+    border-radius: 50px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: fit-content;
+    white-space: nowrap;
+}
+
+.btn-create-course:hover {
+    background-color: #075985;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(3, 105, 161, 0.2);
+}
+
+.course-card-main {
+    background: white;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.course-icon-box {
+    width: 48px;
+    height: 48px;
+    background: #f0f9ff;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0ea5e9;
+    font-size: 1.25rem;
+}
+
+.course-actions-toolbar .btn-icon {
+    color: #94a3b8;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+}
+
+.course-actions-toolbar .btn-icon:hover {
+    color: #1e293b;
+}
+
+.course-actions-toolbar .btn-delete:hover {
+    color: #ef4444;
+}
+
+.instructor-avatars .avatar-stack {
+    display: flex;
+    align-items: center;
+}
+
+.avatar-stack img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid white;
+    margin-right: -8px;
+    object-fit: cover;
+}
+
+.link-manage-structure {
+    color: #0369a1;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.link-manage-structure:hover {
+    text-decoration: underline;
+}
+
+.draft-card {
+    background: white;
+    border-radius: 1.5rem;
+    border: 1px solid #f1f5f9;
+}
+
+.badge-draft {
+    background: #e0e7ff;
+    color: #4338ca;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.progress-custom {
+    height: 6px;
+    background-color: #f1f5f9;
+    border-radius: 10px;
+}
+
+.progress-custom .progress-bar {
+    background-color: #6366f1;
+    border-radius: 10px;
+}
+
+.btn-resume {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.btn-delete-small {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+    color: #94a3b8;
+}
+
+/* Architecture Section */
+.architecture-section h2 {
+    font-size: 1.75rem;
+    color: #1e293b;
+}
+
+.module-card {
+    background: #f1f5f9;
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    border: 1px solid transparent;
+}
+
+.module-header {
+    padding: 1.25rem 1.5rem;
+}
+
+.module-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #cbd5e1;
+    line-height: 1;
+}
+
+.lesson-item {
+    background: white;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.75rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.add-btn-dashed {
+    background: white;
+    border: 2px dashed #e2e8f0;
+    border-radius: 0.75rem;
+    width: 100%;
+    padding: 1rem;
+    color: #64748b;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.add-btn-dashed:hover {
+    border-color: #94a3b8;
+    background: #f8fafc;
+}
+
+/* Stat Cards */
+.stat-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid #f1f5f9;
+    height: 100%;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-growth {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6366f1;
+}

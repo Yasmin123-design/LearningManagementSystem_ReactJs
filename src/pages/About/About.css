@@ -1,0 +1,482 @@
+:root {
+  --primary: #2563eb;
+  --secondary: #4f46e5;
+  --accent: #f59e0b;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --bg-soft: #f8fafc;
+  --white: #ffffff;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.about-page {
+  background-color: var(--white);
+  color: var(--text-dark);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Sections */
+.about-section {
+  padding: 100px 0;
+}
+
+.container-custom {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Hero */
+.about-hero {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  padding-bottom: 60px;
+}
+
+.hero-content {
+  flex: 1;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fb7185;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.5rem;
+}
+
+.hero-tag::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background-color: #fb7185;
+}
+
+.hero-title {
+  font-size: 5rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.hero-title .highlight {
+  color: var(--primary);
+  font-style: italic;
+  display: block;
+}
+
+.hero-subtitle {
+  font-size: 1.125rem;
+  color: var(--text-muted);
+  max-width: 480px;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.btn-primary-p {
+  background-color: var(--primary);
+  color: white;
+  padding: 0.875rem 2rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+  transition: transform 0.2s;
+}
+
+.btn-primary-p:hover {
+  transform: translateY(-2px);
+}
+
+.btn-secondary-p {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-dark);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.hero-visual {
+  flex: 1;
+  position: relative;
+}
+
+.illustration-card {
+  background-color: #10b981;
+  border-radius: 2.5rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.illustration-card img {
+  width: 100%;
+  border-radius: 1.5rem;
+  display: block;
+}
+
+.floating-stats {
+  position: absolute;
+  bottom: 2rem;
+  left: -2rem;
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 220px;
+}
+
+.stats-icon {
+  width: 40px;
+  height: 40px;
+  background: #fdf2f8;
+  color: #db2777;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+/* Featured Courses */
+.featured-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3.5rem;
+}
+
+.featured-header h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.courses-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.course-p-card {
+  background: var(--white);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #f1f5f9;
+  transition: box-shadow 0.3s;
+}
+
+.course-p-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-img-wrapper {
+  height: 200px;
+  position: relative;
+}
+
+.card-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-p-tag {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(15, 23, 42, 0.8);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.card-p-body {
+  padding: 1.5rem;
+}
+
+.card-p-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.card-p-text {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.progress-p-box {
+  margin-bottom: 1.5rem;
+}
+
+.progress-p-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.progress-p-bar {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-p-fill {
+  height: 100%;
+  background: var(--primary);
+}
+
+.btn-enroll-p {
+  width: 100%;
+  padding: 0.75rem;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  transition: all 0.2s;
+}
+
+.course-p-card:hover .btn-enroll-p {
+  background: var(--primary);
+  color: white;
+}
+
+/* Interactive Experience */
+.experience-intro {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.experience-intro h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.experience-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 2rem;
+}
+
+.movie-card {
+  background: #e2e8f0;
+  border-radius: 2.5rem;
+  padding: 3rem;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+}
+
+.play-circle-btn {
+  width: 64px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 3rem;
+  left: 3rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  font-size: 1.5rem;
+}
+
+.feature-cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.f-mini-card {
+  padding: 2.5rem;
+  border-radius: 2rem;
+}
+
+.f-mini-card.pink { background: #fdf2f8; color: #9d174d; }
+.f-mini-card.blue { background: #eef2ff; color: #3730a3; }
+
+.f-mini-card h3 {
+  font-weight: 800;
+  margin: 1.5rem 0 0.5rem;
+}
+
+/* Roadmap */
+.roadmap-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6rem;
+  align-items: center;
+}
+
+.step-item {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.step-num {
+  width: 48px;
+  height: 48px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.roadmap-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.module-list-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #f8fafc;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.module-list-item.active {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: var(--primary);
+}
+
+.module-list-item.locked {
+  opacity: 0.5;
+}
+
+.btn-continue {
+  width: 100%;
+  padding: 1.25rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  font-weight: 700;
+  margin-top: 2rem;
+}
+
+/* CTA */
+.final-cta {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+  border-radius: 3rem;
+  padding: 6rem 2rem;
+  text-align: center;
+  color: white;
+  margin-bottom: 100px;
+}
+
+.final-cta h2 {
+  font-size: 4rem;
+  font-weight: 900;
+  margin-bottom: 2rem;
+}
+
+.final-cta p {
+  font-size: 1.25rem;
+  max-width: 600px;
+  margin: 0 auto 3rem;
+  opacity: 0.8;
+}
+
+.cta-btns {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.btn-white-p {
+  background: white;
+  color: var(--primary);
+  padding: 1rem 2.5rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.btn-outline-white-p {
+  border: 1px solid rgba(255,255,255,0.4);
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 1024px) {
+  .about-hero, .roadmap-wrap, .experience-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .hero-subtitle, .experience-intro p, .final-cta p, .hero-content p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero-btns, .cta-btns {
+    justify-content: center;
+  }
+  .hero-visual, .roadmap-card {
+    order: -1;
+  }
+  .courses-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .hero-title {
+    font-size: 3.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .courses-row {
+    grid-template-columns: 1fr;
+  }
+  .hero-title {
+    font-size: 2.5rem;
+  }
+}

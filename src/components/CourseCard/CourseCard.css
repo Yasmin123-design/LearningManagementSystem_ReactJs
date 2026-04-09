@@ -1,0 +1,6 @@
+/* Course Card Styles */
+.fs-card-title {
+  font-size: 1.3rem !important;
+  font-weight: 700;
+  line-height: 1.4;
+}

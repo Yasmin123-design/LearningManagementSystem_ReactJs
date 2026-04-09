@@ -1,0 +1,55 @@
+/* Dashboard Layout Styles */
+
+/* Sidebar Navigation */
+.sidebar-active {
+  background-color: #eff6ff;
+  color: #1d4ed8 !important;
+  border-left: 4px solid #1d4ed8;
+  padding-left: calc(1rem - 4px) !important;
+}
+.sidebar-active i {
+  color: #1d4ed8;
+}
+.hover-bg:hover {
+  background-color: #f3f4f6;
+  color: #111827 !important;
+}
+
+/* Dashboard Colors */
+.text-dark-primary { color: #111827 !important; }
+.text-dark-secondary { color: #4b5563 !important; }
+.text-brand { color: #1d4ed8 !important; }
+.bg-dashboard-content { background-color: #fafbfd !important; }
+
+/* Dashboard Typography */
+.fs-dash-title { font-size: 3.2rem !important; letter-spacing: -0.02em; }
+.fs-dash-subtitle { font-size: 1.4rem !important; line-height: 1.6; }
+.fs-dash-heading { font-size: 1.7rem !important; }
+.fs-dash-body { font-size: 1.2rem !important; }
+.fs-dash-small { font-size: 1.1rem !important; }
+.fs-dash-xs { font-size: 0.95rem !important; }
+
+/* Dashboard Buttons */
+.dash-btn-primary {
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.dash-btn-primary:hover {
+  background-color: #1e40af;
+}
+
+.dash-btn-outline {
+  border-radius: 0.5rem;
+  color: #1d4ed8;
+  border: 1px solid #e0e7ff;
+  background-color: transparent;
+  transition: all 0.2s;
+}
+.dash-btn-outline:hover {
+  background-color: #eff6ff;
+}

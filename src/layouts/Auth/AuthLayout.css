@@ -1,0 +1,24 @@
+.hover-primary:hover {
+  color: #4f46e5 !important;
+  transition: color 0.2s ease-in-out;
+}
+
+.auth-page-wrapper .input-group-text {
+  padding-right: 0.5rem;
+}
+.auth-page-wrapper .form-control:focus {
+  border-color: #dee2e6;
+}
+.auth-page-wrapper .input-group-text,
+.auth-page-wrapper .form-control {
+  border-color: #e5e7eb;
+  border-radius: 0.5rem;
+}
+.auth-page-wrapper .input-group > .input-group-text:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.auth-page-wrapper .input-group > .form-control {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
