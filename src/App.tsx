@@ -13,6 +13,8 @@ import CourseStructureManager from './pages/CurriculumManager/CourseStructureMan
 import CourseContent from './pages/CoursePlayer/CourseContent';
 import Settings from './pages/Settings/Settings';
 import AuthSuccess from './pages/Auth/AuthSuccess';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
 import About from './pages/About/About';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -58,6 +60,8 @@ const App: React.FC = () => {
           <Route path="/" element={<RoleBasedRedirect />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/auth-success" element={<AuthSuccess />} />
           <Route path="/about" element={<About />} />
 

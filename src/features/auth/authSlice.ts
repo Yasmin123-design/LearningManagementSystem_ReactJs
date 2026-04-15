@@ -113,6 +113,38 @@ export const getLinkedInAuthUrl = createAsyncThunk(
   },
 );
 
+export const forgotPassword = createAsyncThunk(
+  "auth/forgotPassword",
+  async (email: string, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/auth/forgot-password", { email });
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to send reset email",
+      );
+    }
+  },
+);
+
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async (
+    data: { token: string; newPassword: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      const response = await api.post("/auth/reset-password", data);
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to reset password",
+      );
+    }
+  },
+);
+
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -121,6 +153,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
     },
     setToken(
       state,
@@ -152,6 +185,9 @@ const authSlice = createSlice({
           state.loading = false;
           state.token = action.payload.accessToken;
           localStorage.setItem("token", action.payload.accessToken);
+          if (action.payload.refreshToken) {
+            localStorage.setItem("refreshToken", action.payload.refreshToken);
+          }
         },
       )
       .addCase(login.rejected, (state, action) => {
@@ -181,6 +217,7 @@ const authSlice = createSlice({
         state.error = action.payload as string;
         state.token = null;
         localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
       })
       .addCase(updateProfile.pending, (state) => {
         state.loading = true;
@@ -204,6 +241,28 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(updateAvatar.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(forgotPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(resetPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

@@ -81,7 +81,7 @@ const Login: React.FC = () => {
                 <Form.Group className="mb-4" controlId="formBasicPassword">
                     <div className="d-flex justify-content-between align-items-center mb-2">
                         <Form.Label className="fs-xxs fw-bold text-uppercase text-muted m-0" style={{ letterSpacing: '0.05em' }}>Password</Form.Label>
-                        <a href="#forgot" className="text-decoration-none fs-xxs fw-bold text-primary">Forgot password?</a>
+                        <Link to="/forgot-password" title="Forgot Password" id="forgot-password-link" className="text-decoration-none fs-xxs fw-bold text-primary">Forgot password?</Link>
                     </div>
                     <InputGroup>
                         <InputGroup.Text className="bg-light border-0 ps-3 text-secondary" style={{ borderRadius: '0.75rem 0 0 0.75rem' }}>
