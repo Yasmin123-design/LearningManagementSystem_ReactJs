@@ -18,6 +18,7 @@ interface AuthState {
   token: string | null;
   loading: boolean;
   error: string | null;
+  isInitialized: boolean;
 }
 
 const initialState: AuthState = {
@@ -25,14 +26,31 @@ const initialState: AuthState = {
   token: localStorage.getItem("token") || null,
   loading: false,
   error: null,
+  isInitialized: false,
 };
 
 export const login = createAsyncThunk(
   "auth/login",
-  async (credentials: Record<string, string>, { rejectWithValue }) => {
+  async (
+    credentials: Record<string, string>,
+    { dispatch, rejectWithValue },
+  ) => {
     try {
       const response = await api.post("/auth/login", credentials);
-      return response.data.data;
+      const data = response.data.data;
+
+      // Update tokens in state and localStorage immediately
+      dispatch(
+        setToken({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        }),
+      );
+
+      // Fetch user profile immediately after login
+      await dispatch(fetchProfile()).unwrap();
+
+      return data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Login failed");
     }
@@ -129,10 +147,7 @@ export const forgotPassword = createAsyncThunk(
 
 export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
-  async (
-    data: { token: string; newPassword: string },
-    { rejectWithValue },
-  ) => {
+  async (data: { token: string; newPassword: string }, { rejectWithValue }) => {
     try {
       const response = await api.post("/auth/reset-password", data);
       return response.data;
@@ -144,6 +159,51 @@ export const resetPassword = createAsyncThunk(
   },
 );
 
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async (
+    data: { oldPassword: string; newPassword: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      const response = await api.patch("/users/me/change-password", data);
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to change password",
+      );
+    }
+  },
+);
+
+export const initializeAuth = createAsyncThunk(
+  "auth/initializeAuth",
+  async (_, { dispatch, rejectWithValue }) => {
+    const token = localStorage.getItem("token");
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (!token && !refreshToken) {
+      return rejectWithValue("No tokens found");
+    }
+
+    try {
+      // If we have an access token, try to fetch the profile.
+      // If the access token is expired, the interceptor in services/api.ts
+      // will automatically attempt to refresh it.
+      await dispatch(fetchProfile()).unwrap();
+
+      // Sync the new token (if it was refreshed) back to Redux state
+      const newToken = localStorage.getItem("token");
+      if (newToken) {
+        dispatch(setToken({ accessToken: newToken }));
+      }
+
+      return true;
+    } catch (error) {
+      return rejectWithValue("Authentication failed");
+    }
+  },
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -265,6 +325,17 @@ const authSlice = createSlice({
       .addCase(resetPassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(initializeAuth.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(initializeAuth.fulfilled, (state) => {
+        state.loading = false;
+        state.isInitialized = true;
+      })
+      .addCase(initializeAuth.rejected, (state) => {
+        state.loading = false;
+        state.isInitialized = true;
       });
   },
 });

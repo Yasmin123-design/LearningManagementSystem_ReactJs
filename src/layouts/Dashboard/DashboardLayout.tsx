@@ -52,13 +52,22 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, customHeade
                     )}
 
                     {user?.role === 'instructor' && (
-                        <Link
-                            to="/instructorcourses"
-                            className={`d-flex align-items-center gap-3 px-3 py-3 rounded text-decoration-none fw-medium fs-md ${location.pathname === '/instructorcourses' ? 'sidebar-active' : 'text-dark-secondary hover-bg'}`}
-                        >
-                            <i className={`bi bi-book${location.pathname === '/instructorcourses' ? '-fill' : ''} fs-5`}></i>
-                            My Courses
-                        </Link>
+                        <>
+                            <Link
+                                to="/instructorcourses"
+                                className={`d-flex align-items-center gap-3 px-3 py-3 rounded text-decoration-none fw-medium fs-md ${location.pathname === '/instructorcourses' ? 'sidebar-active' : 'text-dark-secondary hover-bg'}`}
+                            >
+                                <i className={`bi bi-book${location.pathname === '/instructorcourses' ? '-fill' : ''} fs-5`}></i>
+                                My Courses
+                            </Link>
+                            <Link
+                                to="/instructor/enrollments"
+                                className={`d-flex align-items-center gap-3 px-3 py-3 rounded text-decoration-none fw-medium fs-md ${location.pathname === '/instructor/enrollments' ? 'sidebar-active' : 'text-dark-secondary hover-bg'}`}
+                            >
+                                <i className={`bi bi-people${location.pathname === '/instructor/enrollments' ? '-fill' : ''} fs-5`}></i>
+                                Student Enrollments
+                            </Link>
+                        </>
                     )}
 
                 {user?.role === 'student' && (

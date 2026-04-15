@@ -33,6 +33,12 @@
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
     padding: 2.5rem;
     margin-bottom: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.settings-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.08), 0 10px 15px -6px rgba(0, 0, 0, 0.08);
 }
 
 /* Avatar Section */
@@ -133,6 +139,71 @@ textarea.form-control-custom {
     margin-top: 0.25rem;
 }
 
+/* Section Header with Icon */
+.card-header-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.header-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.bg-primary-light {
+    background-color: #eff6ff;
+}
+
+.section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.section-subtitle {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-bottom: 0;
+}
+
+/* Password Input Wrapper */
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-wrapper .form-control-custom {
+    padding-right: 3rem !important;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+    padding: 0.25rem;
+    border-radius: 6px;
+}
+
+.password-toggle:hover {
+    color: #4b5563;
+    background-color: #f3f4f6;
+}
+
 /* Verifiction Badge Section */
 .verification-banner {
     background-color: #eff6ff;
@@ -217,6 +288,16 @@ textarea.form-control-custom {
     background: #1d4ed8;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(37, 99, 235, 0.23);
+}
+
+.btn-security {
+    background: #0f172a;
+    box-shadow: 0 4px 14px 0 rgba(15, 23, 42, 0.3);
+}
+
+.btn-security:hover {
+    background: #1e293b;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.2);
 }
 
 .btn-save:active {

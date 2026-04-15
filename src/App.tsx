@@ -8,7 +8,8 @@ import Register from './pages/Auth/Register';
 import Courses from './pages/CourseCatalog/Courses';
 import CourseDetails from './pages/CourseDetails/CourseDetails';
 import MyCourses from './pages/MyCourses/MyCourses';
-import InstructorCourses from './pages/InstructorDashboard/InstructorCourses';
+import InstructorCourses from './pages/InstructorDashboard/InstructorCourses/InstructorCourses';
+import InstructorEnrollments from './pages/InstructorDashboard/InstructorEnrollments/InstructorEnrollments';
 import CourseStructureManager from './pages/CurriculumManager/CourseStructureManager';
 import CourseContent from './pages/CoursePlayer/CourseContent';
 import Settings from './pages/Settings/Settings';
@@ -18,13 +19,13 @@ import ResetPassword from './pages/Auth/ResetPassword';
 import About from './pages/About/About';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import { fetchProfile } from './features/auth/authSlice';
+import { initializeAuth } from './features/auth/authSlice';
 import type { AppDispatch, RootState } from './app/store';
 
 const RoleBasedRedirect: React.FC = () => {
-  const { user, loading } = useSelector((state: RootState) => state.auth);
+  const { user, isInitialized, loading } = useSelector((state: RootState) => state.auth);
 
-  if (loading) {
+  if (!isInitialized || loading) {
     return (
       <div className="d-flex justify-content-center align-items-center vh-100">
         <div className="spinner-border text-primary" role="status">
@@ -43,13 +44,21 @@ const RoleBasedRedirect: React.FC = () => {
 
 const App: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { token, user } = useSelector((state: RootState) => state.auth);
+  const { isInitialized } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (token && !user) {
-      dispatch(fetchProfile());
-    }
-  }, [token, user, dispatch]);
+    dispatch(initializeAuth());
+  }, [dispatch]);
+
+  if (!isInitialized) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
 
   return (
@@ -69,6 +78,7 @@ const App: React.FC = () => {
             <Route path="/courses" element={<Courses />} />
             <Route path="/my-courses" element={<MyCourses />} />
             <Route path="/instructorcourses" element={<InstructorCourses />} />
+            <Route path="/instructor/enrollments" element={<InstructorEnrollments />} />
             <Route path="/instructorcourses/:courseId/manage" element={<CourseStructureManager />} />
             <Route path="/courses/:courseId/content" element={<CourseContent />} />
             <Route path="/courses/:courseId" element={<CourseDetails />} />

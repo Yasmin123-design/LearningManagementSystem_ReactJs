@@ -66,7 +66,7 @@ api.interceptors.response.use(
           {},
           {
             headers: {
-              "refresh-token": refreshToken,
+              Authorization: `Bearer ${refreshToken}`,
             },
           },
         );

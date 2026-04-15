@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, Row, Col, Spinner } from 'react-bootstrap';
-import { PencilLine, CheckCircle2, Info } from 'lucide-react';
+import { PencilLine, CheckCircle2, Info, ShieldCheck, Lock, Eye, EyeOff } from 'lucide-react';
 import DashboardLayout from '../../layouts/Dashboard/DashboardLayout';
-import { updateProfile, updateAvatar } from '../../features/auth/authSlice';
+import { updateProfile, updateAvatar, changePassword } from '../../features/auth/authSlice';
 import type { RootState, AppDispatch } from '../../app/store';
 import './Settings.css';
 import { getAvatarUrl } from '../../utils/getAvatarUrl';
@@ -21,6 +21,19 @@ const Settings: React.FC = () => {
     });
 
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [passwordData, setPasswordData] = useState({
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+    const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+    const [showPasswords, setShowPasswords] = useState({
+        old: false,
+        new: false,
+        confirm: false
+    });
+    const [isChangingPassword, setIsRefreshingPassword] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -74,6 +87,52 @@ const Settings: React.FC = () => {
         } catch (err) {
             console.error('Failed to update avatar:', err);
         }
+    };
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target;
+        setPasswordData(prev => ({ ...prev, [id]: value }));
+        if (passwordError) setPasswordError(null);
+    };
+
+    const handlePasswordSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setPasswordError(null);
+        setPasswordSuccess(null);
+
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setPasswordError("New passwords don't match");
+            return;
+        }
+
+        if (passwordData.newPassword.length < 8) {
+            setPasswordError("Password must be at least 8 characters long");
+            return;
+        }
+
+        setIsRefreshingPassword(true);
+        try {
+            await dispatch(changePassword({
+                oldPassword: passwordData.oldPassword,
+                newPassword: passwordData.newPassword
+            })).unwrap();
+            
+            setPasswordSuccess('Password changed successfully!');
+            setPasswordData({
+                oldPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+            });
+            setTimeout(() => setPasswordSuccess(null), 5000);
+        } catch (err: any) {
+            setPasswordError(err || 'Failed to change password');
+        } finally {
+            setIsRefreshingPassword(false);
+        }
+    };
+
+    const togglePasswordVisibility = (field: 'old' | 'new' | 'confirm') => {
+        setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
     };
 
     const avatarUrl = getAvatarUrl(user?.avatar);
@@ -216,6 +275,124 @@ const Settings: React.FC = () => {
                                                 Saving...
                                             </>
                                         ) : 'Save Changes'}
+                                    </button>
+                                </div>
+                            </Form>
+                        </div>
+
+                        {/* Security Section */}
+                        <div className="settings-card mt-4">
+                            <div className="card-header-with-icon mb-4">
+                                <div className="header-icon bg-primary-light">
+                                    <ShieldCheck size={24} color="#2563eb" />
+                                </div>
+                                <div>
+                                    <h3 className="section-title mb-0">Password & Security</h3>
+                                    <p className="section-subtitle">Update your password to keep your account secure.</p>
+                                </div>
+                            </div>
+
+                            {passwordError && (
+                                <div className="alert alert-danger rounded-4 py-3 px-4 mb-4 border-0 shadow-sm d-flex align-items-center gap-3">
+                                    <Info size={20} />
+                                    <div>{passwordError}</div>
+                                </div>
+                            )}
+
+                            {passwordSuccess && (
+                                <div className="alert alert-success rounded-4 py-3 px-4 mb-4 border-0 shadow-sm d-flex align-items-center gap-3">
+                                    <CheckCircle2 size={20} />
+                                    <div>{passwordSuccess}</div>
+                                </div>
+                            )}
+
+                            <Form onSubmit={handlePasswordSubmit}>
+                                <Row className="mb-4">
+                                    <Col md={12} className="mb-3">
+                                        <Form.Group controlId="oldPassword">
+                                            <Form.Label className="form-label">Current Password</Form.Label>
+                                            <div className="password-input-wrapper">
+                                                <Form.Control 
+                                                    type={showPasswords.old ? "text" : "password"}
+                                                    className="form-control-custom"
+                                                    value={passwordData.oldPassword}
+                                                    onChange={handlePasswordChange}
+                                                    placeholder="Enter current password"
+                                                    required
+                                                />
+                                                <button 
+                                                    type="button" 
+                                                    className="password-toggle"
+                                                    onClick={() => togglePasswordVisibility('old')}
+                                                >
+                                                    {showPasswords.old ? <EyeOff size={20} /> : <Eye size={20} />}
+                                                </button>
+                                            </div>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6} className="mb-3 mb-md-0">
+                                        <Form.Group controlId="newPassword">
+                                            <Form.Label className="form-label">New Password</Form.Label>
+                                            <div className="password-input-wrapper">
+                                                <Form.Control 
+                                                    type={showPasswords.new ? "text" : "password"}
+                                                    className="form-control-custom"
+                                                    value={passwordData.newPassword}
+                                                    onChange={handlePasswordChange}
+                                                    placeholder="Minimum 8 characters"
+                                                    required
+                                                />
+                                                <button 
+                                                    type="button" 
+                                                    className="password-toggle"
+                                                    onClick={() => togglePasswordVisibility('new')}
+                                                >
+                                                    {showPasswords.new ? <EyeOff size={20} /> : <Eye size={20} />}
+                                                </button>
+                                            </div>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Group controlId="confirmPassword">
+                                            <Form.Label className="form-label">Confirm New Password</Form.Label>
+                                            <div className="password-input-wrapper">
+                                                <Form.Control 
+                                                    type={showPasswords.confirm ? "text" : "password"}
+                                                    className="form-control-custom"
+                                                    value={passwordData.confirmPassword}
+                                                    onChange={handlePasswordChange}
+                                                    placeholder="Repeat new password"
+                                                    required
+                                                />
+                                                <button 
+                                                    type="button" 
+                                                    className="password-toggle"
+                                                    onClick={() => togglePasswordVisibility('confirm')}
+                                                >
+                                                    {showPasswords.confirm ? <EyeOff size={20} /> : <Eye size={20} />}
+                                                </button>
+                                            </div>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+
+                                <div className="settings-actions">
+                                    <button 
+                                        type="submit" 
+                                        className="btn-save btn-security"
+                                        disabled={isChangingPassword}
+                                    >
+                                        {isChangingPassword ? (
+                                            <>
+                                                <Spinner animation="border" size="sm" className="me-2" />
+                                                Updating...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Lock size={18} className="me-2" />
+                                                Update Password
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                             </Form>

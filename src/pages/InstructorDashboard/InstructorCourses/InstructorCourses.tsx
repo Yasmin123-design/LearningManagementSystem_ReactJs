@@ -2,15 +2,15 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchInstructorCourses, publishCourse } from '../../features/courses/coursesSlice';
-import type { AppDispatch, RootState } from '../../app/store';
-import DashboardLayout from '../../layouts/Dashboard/DashboardLayout';
+import { fetchInstructorCourses, publishCourse } from '../../../features/courses/coursesSlice';
+import type { AppDispatch, RootState } from '../../../app/store';
+import DashboardLayout from '../../../layouts/Dashboard/DashboardLayout';
 import { Button, Row, Col, ProgressBar} from 'react-bootstrap';
 import './InstructorCourses.css';
-import EditCourseModal from './EditCourseModal';
-import DeleteConfirmModal from './DeleteConfirmModal';
-import type { Course } from '../../features/courses/coursesSlice';
-import CreateCourseModal from './CreateCourseModal';
+import EditCourseModal from '../EditCourseModal';
+import DeleteConfirmModal from '../DeleteConfirmModal';
+import type { Course } from '../../../features/courses/coursesSlice';
+import CreateCourseModal from '../CreateCourseModal';
 
 const InstructorCourses: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -61,7 +61,6 @@ const InstructorCourses: React.FC = () => {
     return (
         <DashboardLayout>
             <div className="instructor-dashboard container-fluid px-0">
-                {/* Header Section */}
                 <header className="instructor-header d-flex justify-content-between align-items-start mb-5">
                     <div>
                         <div className="text-primary fw-bold small text-uppercase mb-1 ls-1" style={{ fontSize: '0.7rem' }}>Instructor Dashboard</div>
@@ -78,14 +77,11 @@ const InstructorCourses: React.FC = () => {
                 </header>
 
                 <Row className="g-4 mb-5">
-                    {/* Course Management Cards */}
                     <Col lg={8}>
                         {courses.map((course) => (
                             <div key={course.id} className="course-card-main p-4 mb-4">
                                 <div className="d-flex justify-content-between align-items-center mb-4">
-                                    <div className="course-icon-box">
-                                        <i className="bi bi-brush"></i>
-                                    </div>
+                    
                                     <div className="course-actions-toolbar d-flex gap-2 align-items-center">
                                         {!course.isPublished && (
                                             <Button 
@@ -139,7 +135,6 @@ const InstructorCourses: React.FC = () => {
 
                 
 
-                {/* Bottom Stats Grid */}
                 <Row className="g-4">
                     {stats.map((stat, idx) => (
                         <Col key={idx} md={idx === 0 ? 3 : 2} lg={idx === 0 ? 3 : idx === 3 ? 4 : 2} className={idx === 1 ? 'ms-auto' : ''}>
