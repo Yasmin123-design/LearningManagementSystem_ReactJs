@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import type { AppDispatch } from '../app/store';
-import { fetchProfile, setToken } from '../features/auth/authSlice';
+import type { AppDispatch } from '../../app/store';
+import { fetchProfile, setToken } from '../../features/auth/authSlice';
 
 const AuthSuccess: React.FC = () => {
   const [searchParams] = useSearchParams();

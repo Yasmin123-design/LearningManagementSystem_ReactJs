@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMyEnrollments } from '../../../features/enrollments/enrollmentsSlice';
-import type { AppDispatch, RootState } from '../../../app/store';
-import DashboardLayout from '../../../layouts/Dashboard/DashboardLayout';
+import { fetchMyEnrollments } from '../../features/enrollments/enrollmentsSlice';
+import type { AppDispatch, RootState } from '../../app/store';
+import DashboardLayout from '../../layouts/Dashboard/DashboardLayout';
 import { Button, Card, Row, Col, Badge, Form, InputGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import './MyCourses.css';

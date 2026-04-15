@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCourses } from '../../../features/courses/coursesSlice';
-import { fetchMyEnrollments } from '../../../features/enrollments/enrollmentsSlice';
-import { fetchProfile } from '../../../features/auth/authSlice';
-import type { AppDispatch, RootState } from '../../../app/store';
-import CourseCard from '../../../components/CourseCard/CourseCard';
-import DashboardLayout from '../../../layouts/Dashboard/DashboardLayout';
+import { fetchCourses } from '../../features/courses/coursesSlice';
+import { fetchMyEnrollments } from '../../features/enrollments/enrollmentsSlice';
+import { fetchProfile } from '../../features/auth/authSlice';
+import type { AppDispatch, RootState } from '../../app/store';
+import CourseCard from '../../components/CourseCard/CourseCard';
+import DashboardLayout from '../../layouts/Dashboard/DashboardLayout';
 import './Courses.css';
 
 

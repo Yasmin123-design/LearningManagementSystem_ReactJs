@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCourseDetails } from '../../../features/courses/coursesSlice';
-import { fetchMyEnrollments, enrollInCourse, getPaymentUrl } from '../../../features/enrollments/enrollmentsSlice';
-import type { AppDispatch, RootState } from '../../../app/store';
+import { fetchCourseDetails } from '../../features/courses/coursesSlice';
+import { fetchMyEnrollments, enrollInCourse, getPaymentUrl } from '../../features/enrollments/enrollmentsSlice';
+import type { AppDispatch, RootState } from '../../app/store';
 import { Accordion, Button, Badge, Modal } from 'react-bootstrap';
 import { Clock, PlayCircle, FileText, Lock, CheckCircle, Check } from 'lucide-react';
 import './CourseDetails.css';
-import { getAvatarUrl } from '../../../utils/getAvatarUrl';
+import { getAvatarUrl } from '../../utils/getAvatarUrl';
 
 const CourseDetails: React.FC = () => {
     const { courseId } = useParams<{ courseId: string }>();

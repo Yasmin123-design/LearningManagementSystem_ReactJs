@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Button, InputGroup } from 'react-bootstrap';
-import { login, getGoogleAuthUrl, getLinkedInAuthUrl } from '../features/auth/authSlice';
-import type { AppDispatch, RootState } from '../app/store';
-import AuthLayout from '../layouts/Auth/AuthLayout';
+import { login, getGoogleAuthUrl, getLinkedInAuthUrl } from '../../features/auth/authSlice';
+import type { AppDispatch, RootState } from '../../app/store';
+import AuthLayout from '../../layouts/Auth/AuthLayout';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');

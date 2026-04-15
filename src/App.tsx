@@ -3,15 +3,16 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import ProtectedRoute from './routes/ProtectedRoute';
 
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Courses from './pages/Course/Course/Courses';
-import CourseDetails from './pages/Course/CourseDetails/CourseDetails';
-import MyCourses from './pages/Course/MyCourses/MyCourses';
-import InstructorCourses from './pages/Course/InstructorCourses/InstructorCourses';
-import CourseContent from './pages/Course/CourseContent/CourseContent';
+import Login from './pages/Auth/Login';
+import Register from './pages/Auth/Register';
+import Courses from './pages/CourseCatalog/Courses';
+import CourseDetails from './pages/CourseDetails/CourseDetails';
+import MyCourses from './pages/MyCourses/MyCourses';
+import InstructorCourses from './pages/InstructorDashboard/InstructorCourses';
+import CourseStructureManager from './pages/CurriculumManager/CourseStructureManager';
+import CourseContent from './pages/CoursePlayer/CourseContent';
 import Settings from './pages/Settings/Settings';
-import AuthSuccess from './pages/AuthSuccess';
+import AuthSuccess from './pages/Auth/AuthSuccess';
 import About from './pages/About/About';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -64,6 +65,7 @@ const App: React.FC = () => {
             <Route path="/courses" element={<Courses />} />
             <Route path="/my-courses" element={<MyCourses />} />
             <Route path="/instructorcourses" element={<InstructorCourses />} />
+            <Route path="/instructorcourses/:courseId/manage" element={<CourseStructureManager />} />
             <Route path="/courses/:courseId/content" element={<CourseContent />} />
             <Route path="/courses/:courseId" element={<CourseDetails />} />
             <Route path="/settings" element={<Settings />} />

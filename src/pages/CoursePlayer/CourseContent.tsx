@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchModulesByCourse, fetchLessonsByModule, fetchCourseDetails } from '../../../features/courses/coursesSlice';
-import type { AppDispatch, RootState } from '../../../app/store';
-import DashboardLayout from '../../../layouts/Dashboard/DashboardLayout';
+import { fetchCourseDetails } from '../../features/courses/coursesSlice';
+import { fetchModulesByCourse } from '../../features/courses/modulesSlice';
+import { fetchLessonsByModule } from '../../features/courses/lessonsSlice';
+import type { AppDispatch, RootState } from '../../app/store';
+import DashboardLayout from '../../layouts/Dashboard/DashboardLayout';
 import { Button, Row, Col, Accordion, Badge, ProgressBar } from 'react-bootstrap';
 import './CourseContent.css';
 
 const CourseContent: React.FC = () => {
     const { courseId } = useParams<{ courseId: string }>();
     const dispatch = useDispatch<AppDispatch>();
-    const { courseContent, currentCourse, loading, error } = useSelector((state: RootState) => state.courses);
+    const { currentCourse, loading: courseLoading, error: courseError } = useSelector((state: RootState) => state.courses);
+    const { modules, loading: modulesLoading, error: modulesError } = useSelector((state: RootState) => state.modules);
+    const { lessons, loading: lessonsLoading, error: lessonsError } = useSelector((state: RootState) => state.lessons);
+
+    const loading = courseLoading || modulesLoading || lessonsLoading;
+    const error = courseError || modulesError || lessonsError;
+    const courseContent = modules;
     const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
     const [selectedLesson, setSelectedLesson] = useState<any>(null);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -108,7 +116,7 @@ const CourseContent: React.FC = () => {
                                     </Accordion.Header>
                                     <Accordion.Body className="p-0">
                                         <div className="lesson-list">
-                                            {module.lessons?.map((lesson) => (
+                                            {lessons.filter(l => l.moduleId === module.id).map((lesson) => (
                                                 <div 
                                                     key={lesson.id} 
                                                     className={`lesson-item px-5 py-2 d-flex align-items-center gap-3 ${selectedLesson?.id === lesson.id ? 'active' : ''}`}
@@ -204,7 +212,7 @@ const CourseContent: React.FC = () => {
                                          <span className="display-6 fw-bold text-light" style={{ color: '#eee' }}>0{mIdx + 1}</span>
                                          <div>
                                              <h5 className="fw-bold mb-1">{module.title}</h5>
-                                             <span className="text-secondary small">{module.lessons?.length || 0} Lessons • {module.description}</span>
+                                             <span className="text-secondary small">{lessons.filter(l => l.moduleId === module.id).length || 0} Lessons • {module.description}</span>
                                          </div>
                                      </div>
                                      <i className="bi bi-chevron-down text-secondary"></i>

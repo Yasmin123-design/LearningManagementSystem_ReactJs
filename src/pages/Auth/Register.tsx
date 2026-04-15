@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
-import { register } from '../features/auth/authSlice';
-import type { AppDispatch, RootState } from '../app/store';
-import AuthLayout from '../layouts/Auth/AuthLayout';
+import { register } from '../../features/auth/authSlice';
+import type { AppDispatch, RootState } from '../../app/store';
+import AuthLayout from '../../layouts/Auth/AuthLayout';
 
 const Register: React.FC = () => {
     const [email, setEmail] = useState('');
