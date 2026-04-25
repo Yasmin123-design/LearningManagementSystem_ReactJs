@@ -4,6 +4,7 @@ import coursesReducer from '../features/courses/coursesSlice';
 import modulesReducer from '../features/courses/modulesSlice';
 import lessonsReducer from '../features/courses/lessonsSlice';
 import enrollmentsReducer from '../features/enrollments/enrollmentsSlice';
+import quizReducer from '../features/quizzes/quizSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     modules: modulesReducer,
     lessons: lessonsReducer,
     enrollments: enrollmentsReducer,
+    quiz: quizReducer,
   },
 });
 

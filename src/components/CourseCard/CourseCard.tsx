@@ -119,4 +119,4 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
     );
 };
 
-export default CourseCard;
+export default React.memo(CourseCard);
