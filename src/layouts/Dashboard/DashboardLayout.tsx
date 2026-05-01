@@ -32,7 +32,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, customHeade
                         src={profile.avatar}
                         alt={profile.name}
                         className="rounded-circle"
-                        style={{ width: '50px', height: '50px', objectFit: 'contain' }}
+                        style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                     />
                     <div>
                         <div className="fw-bold text-dark-primary fs-md">{profile.name}</div>

@@ -26,6 +26,15 @@ export interface Course {
   isPublished?: boolean;
 }
 
+export interface PaginationMeta {
+  page: number;
+  take: number;
+  itemCount: number;
+  pageCount: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -62,6 +71,7 @@ interface CoursesState {
   loading: boolean;
   error: string | null;
   fullCourseContent: any | null;
+  pagination: PaginationMeta | null;
 }
 
 const initialState: CoursesState = {
@@ -72,14 +82,15 @@ const initialState: CoursesState = {
   fullCourseContent: null,
   loading: false,
   error: null,
+  pagination: null,
 };
 
 export const fetchCourses = createAsyncThunk(
   "courses/fetchAll",
-  async (_, { rejectWithValue }) => {
+  async (params: { page?: number } | undefined, { rejectWithValue }) => {
     try {
-      const response = await api.get("/courses");
-      return response.data.data;
+      const response = await api.get("/courses", { params });
+      return response.data;
     } catch (err: any) {
       return rejectWithValue(
         err.response?.data?.message || "Failed to load courses",
@@ -102,7 +113,6 @@ export const fetchCourseDetails = createAsyncThunk(
   },
 );
 
-
 export const fetchFullCourseContent = createAsyncThunk(
   "courses/fetchFullContent",
   async (courseId: string, { rejectWithValue }) => {
@@ -119,9 +129,9 @@ export const fetchFullCourseContent = createAsyncThunk(
 
 export const fetchInstructorCourses = createAsyncThunk(
   "courses/fetchInstructor",
-  async (_, { rejectWithValue }) => {
+  async (params: { page?: number } | undefined, { rejectWithValue }) => {
     try {
-      const response = await api.get("/courses/instructor/me");
+      const response = await api.get("/courses/instructor/me", { params });
       return response.data;
     } catch (err: any) {
       return rejectWithValue(
@@ -219,6 +229,27 @@ const coursesSlice = createSlice({
     clearCurrentCourse(state) {
       state.currentCourse = null;
     },
+    addCourse(state, action: PayloadAction<Course>) {
+      const exists = state.courses.some((c) => c.id === action.payload.id);
+      if (!exists) {
+        state.courses.unshift(action.payload);
+      }
+    },
+    updateCourseSuccess(state, action: PayloadAction<Course>) {
+      const index = state.courses.findIndex((c) => c.id === action.payload.id);
+      if (index !== -1) {
+        state.courses[index] = action.payload;
+      }
+      if (state.currentCourse?.id === action.payload.id) {
+        state.currentCourse = action.payload;
+      }
+    },
+    deleteCourseSuccess(state, action: PayloadAction<string>) {
+      state.courses = state.courses.filter((c) => c.id !== action.payload);
+      if (state.currentCourse?.id === action.payload) {
+        state.currentCourse = null;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -228,9 +259,15 @@ const coursesSlice = createSlice({
       })
       .addCase(
         fetchCourses.fulfilled,
-        (state, action: PayloadAction<Course[]>) => {
+        (
+          state,
+          action: PayloadAction<{ data: Course[]; meta?: PaginationMeta }>,
+        ) => {
           state.loading = false;
-          state.courses = action.payload;
+          state.courses = action.payload.data || action.payload; // Fallback for non-paginated or old format
+          if (action.payload.meta) {
+            state.pagination = action.payload.meta;
+          }
         },
       )
       .addCase(fetchCourses.rejected, (state, action) => {
@@ -262,9 +299,15 @@ const coursesSlice = createSlice({
       })
       .addCase(
         fetchInstructorCourses.fulfilled,
-        (state, action: PayloadAction<{ data: Course[] }>) => {
+        (
+          state,
+          action: PayloadAction<{ data: Course[]; meta?: PaginationMeta }>,
+        ) => {
           state.loading = false;
           state.courses = action.payload.data;
+          if (action.payload.meta) {
+            state.pagination = action.payload.meta;
+          }
         },
       )
       .addCase(fetchInstructorCourses.rejected, (state, action) => {
@@ -316,33 +359,42 @@ const coursesSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(publishCourse.fulfilled, (state, action: PayloadAction<Course>) => {
-        state.loading = false;
-        const index = state.courses.findIndex(
-          (c) => c.id === action.payload.id,
-        );
-        if (index !== -1) {
-          state.courses[index] = action.payload;
-        }
-        if (state.currentCourse?.id === action.payload.id) {
-          state.currentCourse = action.payload;
-        }
-      })
+      .addCase(
+        publishCourse.fulfilled,
+        (state, action: PayloadAction<Course>) => {
+          state.loading = false;
+          const index = state.courses.findIndex(
+            (c) => c.id === action.payload.id,
+          );
+          if (index !== -1) {
+            state.courses[index] = action.payload;
+          }
+          if (state.currentCourse?.id === action.payload.id) {
+            state.currentCourse = action.payload;
+          }
+        },
+      )
       .addCase(publishCourse.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
-      .addCase(fetchCategories.fulfilled, (state, action: PayloadAction<Category[]>) => {
-        state.categories = action.payload;
-      })
+      .addCase(
+        fetchCategories.fulfilled,
+        (state, action: PayloadAction<Category[]>) => {
+          state.categories = action.payload;
+        },
+      )
       .addCase(createCourse.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(createCourse.fulfilled, (state, action: PayloadAction<Course>) => {
-        state.loading = false;
-        state.courses.unshift(action.payload);
-      })
+      .addCase(
+        createCourse.fulfilled,
+        (state, action: PayloadAction<Course>) => {
+          state.loading = false;
+          state.courses.unshift(action.payload);
+        },
+      )
       .addCase(createCourse.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -350,5 +402,5 @@ const coursesSlice = createSlice({
   },
 });
 
-export const { clearCurrentCourse } = coursesSlice.actions;
+export const { clearCurrentCourse, addCourse, updateCourseSuccess, deleteCourseSuccess } = coursesSlice.actions;
 export default coursesSlice.reducer;

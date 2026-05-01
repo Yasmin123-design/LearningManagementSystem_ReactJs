@@ -14,7 +14,8 @@ import CreateCourseModal from '../CreateCourseModal';
 
 const InstructorCourses: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { courses, loading } = useSelector((state: RootState) => state.courses);
+    const { courses, loading, pagination } = useSelector((state: RootState) => state.courses);
+    const [page, setPage] = React.useState(1);
 
     const [showEditModal, setShowEditModal] = React.useState(false);
     const [showDeleteModal, setShowDeleteModal] = React.useState(false);
@@ -22,8 +23,13 @@ const InstructorCourses: React.FC = () => {
     const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
 
     useEffect(() => {
-        dispatch(fetchInstructorCourses());
-    }, [dispatch]);
+        dispatch(fetchInstructorCourses({ page }));
+    }, [dispatch, page]);
+
+    const handlePageChange = (newPage: number) => {
+        setPage(newPage);
+        window.scrollTo(0, 0);
+    };
 
     const handleEditClick = (course: Course) => {
         setSelectedCourse(course);
@@ -129,6 +135,40 @@ const InstructorCourses: React.FC = () => {
                                 </div>
                             </div>
                         ))}
+
+                        {pagination && pagination.pageCount > 1 && (
+                            <div className="d-flex justify-content-center gap-2 mt-4 mb-5">
+                                <Button 
+                                    variant="outline-primary" 
+                                    className="rounded-pill px-4"
+                                    disabled={page === 1}
+                                    onClick={() => handlePageChange(page - 1)}
+                                >
+                                    <i className="bi bi-chevron-left me-2"></i> Previous
+                                </Button>
+                                <div className="d-flex align-items-center gap-2 mx-2">
+                                    {[...Array(pagination.pageCount)].map((_, i) => (
+                                        <Button
+                                            key={i + 1}
+                                            variant={page === i + 1 ? "primary" : "outline-light"}
+                                            className={`rounded-circle p-0 ${page === i + 1 ? '' : 'text-dark'}`}
+                                            style={{ width: '40px', height: '40px' }}
+                                            onClick={() => handlePageChange(i + 1)}
+                                        >
+                                            {i + 1}
+                                        </Button>
+                                    ))}
+                                </div>
+                                <Button 
+                                    variant="outline-primary" 
+                                    className="rounded-pill px-4"
+                                    disabled={page === pagination.pageCount}
+                                    onClick={() => handlePageChange(page + 1)}
+                                >
+                                    Next <i className="bi bi-chevron-right ms-2"></i>
+                                </Button>
+                            </div>
+                        )}
                     </Col>
 
                 </Row>

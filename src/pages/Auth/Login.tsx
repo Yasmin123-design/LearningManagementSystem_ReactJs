@@ -5,16 +5,29 @@ import { Form, Button, InputGroup } from 'react-bootstrap';
 import { login, getGoogleAuthUrl, getLinkedInAuthUrl } from '../../features/auth/authSlice';
 import type { AppDispatch, RootState } from '../../app/store';
 import AuthLayout from '../../layouts/Auth/AuthLayout';
+import { useForm } from '../../hooks/useForm';
 
 const Login: React.FC = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [keepSignedIn, setKeepSignedIn] = useState(false);
-
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { loading, error, token, user } = useSelector((state: RootState) => state.auth);
+
+    const { values, handleChange, handleSubmit } = useForm({
+        initialValues: {
+            email: '',
+            password: '',
+            keepSignedIn: false
+        },
+        onSubmit: (formValues) => {
+            if (formValues.email && formValues.password) {
+                dispatch(login({ 
+                    email: formValues.email, 
+                    password: formValues.password 
+                }));
+            }
+        }
+    });
 
     useEffect(() => {
         if (token && user) {
@@ -25,13 +38,6 @@ const Login: React.FC = () => {
             }
         }
     }, [token, user, navigate]);
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (email && password) {
-            dispatch(login({ email, password }));
-        }
-    };
 
     const handleOAuthLogin = async (provider: 'google' | 'linkedin') => {
         const action = provider === 'google' 
@@ -68,9 +74,10 @@ const Login: React.FC = () => {
                         </InputGroup.Text>
                         <Form.Control
                             type="email"
+                            name="email"
                             placeholder="name@company.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={values.email}
+                            onChange={handleChange}
                             className="bg-light border-0 py-3 ps-2 fs-sm"
                             required
                             style={{ boxShadow: 'none', borderRadius: '0 0.75rem 0.75rem 0' }}
@@ -89,9 +96,10 @@ const Login: React.FC = () => {
                         </InputGroup.Text>
                         <Form.Control
                             type={showPassword ? "text" : "password"}
+                            name="password"
                             placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={values.password}
+                            onChange={handleChange}
                             className="bg-light border-0 py-3 ps-2 fs-sm"
                             required
                             style={{ boxShadow: 'none' }}
@@ -109,10 +117,11 @@ const Login: React.FC = () => {
                 <div className="d-flex align-items-center mb-4">
                     <Form.Check
                         type="checkbox"
+                        name="keepSignedIn"
                         label="Keep me logged in"
                         className="fs-sm text-secondary"
-                        checked={keepSignedIn}
-                        onChange={(e) => setKeepSignedIn(e.target.checked)}
+                        checked={values.keepSignedIn}
+                        onChange={handleChange}
                     />
                 </div>
 

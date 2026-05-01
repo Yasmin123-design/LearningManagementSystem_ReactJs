@@ -6,6 +6,7 @@ import type { AppDispatch } from '../../app/store';
 import DashboardLayout from '../../layouts/Dashboard/DashboardLayout';
 import { Button, Form, Card, Badge, Row, Col, Spinner } from 'react-bootstrap';
 import toast from 'react-hot-toast';
+import { useForm } from '../../hooks/useForm';
 import './QuizManagementPage.css';
 
 const QuizManagementPage: React.FC = () => {
@@ -15,32 +16,52 @@ const QuizManagementPage: React.FC = () => {
     
     const [quizData, setQuizData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
 
     // Editing States
     const [editingOptionId, setEditingOptionId] = useState<string | null>(null);
     const [editingText, setEditingText] = useState('');
+    const [editingIsCorrect, setEditingIsCorrect] = useState(false);
     const [addingOptionToQuestion, setAddingOptionToQuestion] = useState<string | null>(null);
     const [newOptionText, setNewOptionText] = useState('');
+    const [newOptionIsCorrect, setNewOptionIsCorrect] = useState(false);
+
+    const { values, handleChange, handleSubmit, setValues, isSubmitting: saving } = useForm({
+        initialValues: {
+            title: '',
+            description: '',
+            passingScore: 60
+        },
+        onSubmit: async (formValues) => {
+            const action = await dispatch(updateQuiz({ quizId: quizData.id, data: formValues }));
+            if (updateQuiz.fulfilled.match(action)) {
+                toast.success("Settings saved!");
+            }
+        }
+    });
 
     useEffect(() => {
         if (lessonId) {
             setLoading(true);
             dispatch(fetchQuizByLesson(lessonId)).then((res) => {
                 if (res.payload) {
-                    setQuizData(res.payload);
+                    const data = res.payload;
+                    setQuizData(data);
+                    setValues({
+                        title: data.title || '',
+                        description: data.description || '',
+                        passingScore: data.passingScore || 60
+                    });
                 }
                 setLoading(false);
             });
         }
-    }, [dispatch, lessonId]);
+    }, [dispatch, lessonId, setValues]);
 
-    // Custom Confirmation Toast
     const confirmAction = (message: string, onConfirm: () => void) => {
         toast((t) => (
             <div className="d-flex flex-column gap-3 p-2">
                 <div className="d-flex align-items-center gap-3">
-                    <div className="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+                    <div className="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '40px', height: '40px' }}>
                         <i className="bi bi-exclamation-triangle-fill"></i>
                     </div>
                     <div>
@@ -62,27 +83,8 @@ const QuizManagementPage: React.FC = () => {
             style: {
                 minWidth: '350px',
                 borderRadius: '16px',
-                background: '#fff',
-                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-                border: '1px solid #f1f5f9'
             },
         });
-    };
-
-    const handleSaveGeneralSettings = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSaving(true);
-        const formData = new FormData(e.target as HTMLFormElement);
-        const data = {
-            title: formData.get('title'),
-            description: formData.get('description'),
-            passingScore: Number(formData.get('passingScore'))
-        };
-        const action = await dispatch(updateQuiz({ quizId: quizData.id, data }));
-        if (updateQuiz.fulfilled.match(action)) {
-            toast.success("Settings saved!");
-        }
-        setSaving(false);
     };
 
     const handleAddNewQuestion = async () => {
@@ -112,58 +114,97 @@ const QuizManagementPage: React.FC = () => {
         });
     };
 
-    const handleStartAddingOption = (questionId: string) => {
-        setAddingOptionToQuestion(questionId);
-        setNewOptionText('');
-    };
-
     const submitNewOption = async (questionId: string) => {
         if (!newOptionText.trim()) {
             setAddingOptionToQuestion(null);
             return;
         }
-        const action = await dispatch(addOption({ questionId, data: { text: newOptionText, isCorrect: false } }));
+
+        // If this new option is correct, unmark existing ones locally/server-side
+        if (newOptionIsCorrect) {
+            await unmarkOtherCorrectOptions(questionId);
+        }
+
+        const action = await dispatch(addOption({ 
+            questionId, 
+            data: { text: newOptionText, isCorrect: newOptionIsCorrect } 
+        }));
         if (addOption.fulfilled.match(action)) {
-            const updated = quizData.questions.map((q: any) => 
-                q.id === questionId ? { ...q, options: [...(q.options || []), action.payload] } : q
-            );
+            const updated = quizData.questions.map((q: any) => {
+                if (q.id === questionId) {
+                    // Update the list of options, ensuring radio behavior
+                    const cleanOptions = newOptionIsCorrect 
+                        ? (q.options || []).map((o: any) => ({ ...o, isCorrect: false }))
+                        : (q.options || []);
+                    return { ...q, options: [...cleanOptions, action.payload] };
+                }
+                return q;
+            });
             setQuizData({ ...quizData, questions: updated });
             setAddingOptionToQuestion(null);
+            setNewOptionText('');
+            setNewOptionIsCorrect(false);
             toast.success("Option added!");
         }
     };
 
+    const unmarkOtherCorrectOptions = async (questionId: string, currentOptionId?: string) => {
+        const question = quizData.questions.find((q: any) => q.id === questionId);
+        if (!question) return;
+        
+        const correctOptions = (question.options || []).filter((o: any) => o.isCorrect && o.id !== currentOptionId);
+        for (const co of correctOptions) {
+            await dispatch(updateOption({ optionId: co.id, data: { isCorrect: false } }));
+        }
+    };
+
     const handleOptionToggle = async (questionId: string, option: any) => {
-        const action = await dispatch(updateOption({ optionId: option.id, data: { isCorrect: !option.isCorrect } }));
+        const newStatus = !option.isCorrect;
+        
+        // If we are setting it to correct, unmark others first
+        if (newStatus) {
+            await unmarkOtherCorrectOptions(questionId, option.id);
+        }
+
+        const action = await dispatch(updateOption({ optionId: option.id, data: { isCorrect: newStatus } }));
         if (updateOption.fulfilled.match(action)) {
             const updated = quizData.questions.map((q: any) => {
                 if (q.id === questionId) {
                     return {
                         ...q,
-                        options: q.options.map((o: any) => o.id === option.id ? { ...o, isCorrect: !o.isCorrect } : o)
+                        options: q.options.map((o: any) => {
+                            if (o.id === option.id) return { ...o, isCorrect: newStatus };
+                            if (newStatus) return { ...o, isCorrect: false }; // Ensure local radio behavior
+                            return o;
+                        })
                     };
                 }
                 return q;
             });
             setQuizData({ ...quizData, questions: updated });
-            toast.success("Correct answer set!");
+            toast.success(newStatus ? "Marked as correct" : "Status cleared");
         }
-    };
-
-    const handleStartEditingOption = (option: any) => {
-        setEditingOptionId(option.id);
-        setEditingText(option.text);
     };
 
     const handleSaveOptionEdit = async (questionId: string, optionId: string) => {
         if (!editingText.trim()) return;
-        const action = await dispatch(updateOption({ optionId, data: { text: editingText } }));
+
+        // If we are edit-saving it as correct, unmark others
+        if (editingIsCorrect) {
+            await unmarkOtherCorrectOptions(questionId, optionId);
+        }
+
+        const action = await dispatch(updateOption({ optionId, data: { text: editingText, isCorrect: editingIsCorrect } }));
         if (updateOption.fulfilled.match(action)) {
             const updated = quizData.questions.map((q: any) => {
                 if (q.id === questionId) {
                     return {
                         ...q,
-                        options: q.options.map((o: any) => o.id === optionId ? { ...o, text: editingText } : o)
+                        options: q.options.map((o: any) => {
+                            if (o.id === optionId) return { ...o, text: editingText, isCorrect: editingIsCorrect };
+                            if (editingIsCorrect) return { ...o, isCorrect: false };
+                            return o;
+                        })
                     };
                 }
                 return q;
@@ -218,18 +259,28 @@ const QuizManagementPage: React.FC = () => {
                             <p className="text-secondary small">Manage your quiz configuration and question set from this central dashboard.</p>
                         </Card.Header>
                         <Card.Body className="p-4 pt-0">
-                            <Form onSubmit={handleSaveGeneralSettings}>
+                            <Form onSubmit={handleSubmit}>
                                 <Row className="g-4 mb-4">
                                     <Col md={8}>
                                         <Form.Group>
                                             <Form.Label className="small fw-bold text-uppercase text-secondary ls-1">Quiz Title</Form.Label>
-                                            <Form.Control name="title" defaultValue={quizData.title} className="bg-light border-0 py-2 shadow-none" />
+                                            <Form.Control 
+                                                name="title" 
+                                                value={values.title} 
+                                                onChange={handleChange}
+                                                className="bg-light border-0 py-2 shadow-none" 
+                                            />
                                         </Form.Group>
                                     </Col>
                                     <Col md={4}>
                                         <Form.Group>
                                             <Form.Label className="small fw-bold text-uppercase text-secondary ls-1">Passing Score (%)</Form.Label>
-                                            <Form.Select name="passingScore" defaultValue={quizData.passingScore} className="bg-light border-0 py-2 shadow-none">
+                                            <Form.Select 
+                                                name="passingScore" 
+                                                value={values.passingScore} 
+                                                onChange={handleChange}
+                                                className="bg-light border-0 py-2 shadow-none"
+                                            >
                                                 <option value="50">50%</option>
                                                 <option value="60">60%</option>
                                                 <option value="70">70%</option>
@@ -240,7 +291,14 @@ const QuizManagementPage: React.FC = () => {
                                     <Col md={12}>
                                         <Form.Group>
                                             <Form.Label className="small fw-bold text-uppercase text-secondary ls-1">Description</Form.Label>
-                                            <Form.Control as="textarea" name="description" rows={3} defaultValue={quizData.description} className="bg-light border-0 shadow-none" />
+                                            <Form.Control 
+                                                as="textarea" 
+                                                name="description" 
+                                                rows={3} 
+                                                value={values.description} 
+                                                onChange={handleChange}
+                                                className="bg-light border-0 shadow-none" 
+                                            />
                                         </Form.Group>
                                     </Col>
                                 </Row>
@@ -282,28 +340,35 @@ const QuizManagementPage: React.FC = () => {
                                 <div className="options-section mb-4">
                                     <Form.Label className="small fw-bold text-uppercase text-secondary ls-1 mb-3">Answer Options</Form.Label>
                                     {question.options?.map((option: any, oIdx: number) => (
-                                        <div key={option.id} className={`d-flex align-items-center gap-3 mb-2 p-3 rounded-4 border transition-all ${option.isCorrect ? 'bg-indigo-50 border-primary' : 'bg-white border-light hover-shadow-sm'}`}>
+                                        <div key={option.id} className={`d-flex align-items-center gap-3 mb-2 p-3 rounded-4 border transition-all ${option.isCorrect ? 'bg-indigo-50 border-primary shadow-sm' : 'bg-white border-light hover-shadow-sm'}`}>
                                             <div 
-                                                className={`option-letter flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center fw-bold transition-all ${option.isCorrect ? 'bg-primary text-white scale-110' : 'bg-light text-secondary border'}`}
+                                                className={`option-letter flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center fw-bold transition-all ${option.isCorrect ? 'bg-primary text-white scale-110 shadow' : 'bg-light text-secondary border'}`}
                                                 style={{ width: '36px', height: '36px', cursor: 'pointer' }}
                                                 onClick={() => handleOptionToggle(question.id, option)}
+                                                title="Toggle correct answer"
                                             >
                                                 {String.fromCharCode(65 + oIdx)}
                                             </div>
                                             
                                             <div className="flex-grow-1">
                                                 {editingOptionId === option.id ? (
-                                                    <div className="d-flex gap-2 align-items-center">
+                                                    <div className="d-flex gap-2 align-items-center p-1 bg-white rounded-3 shadow-sm">
+                                                        <Form.Check 
+                                                            type="switch"
+                                                            checked={editingIsCorrect}
+                                                            onChange={(e) => setEditingIsCorrect(e.target.checked)}
+                                                            className="ms-2"
+                                                        />
                                                         <Form.Control 
                                                             autoFocus
                                                             size="sm"
                                                             value={editingText}
                                                             onChange={(e) => setEditingText(e.target.value)}
-                                                            className="border-primary shadow-none"
+                                                            className="border-0 shadow-none bg-light"
                                                             onKeyDown={(e) => e.key === 'Enter' && handleSaveOptionEdit(question.id, option.id)}
                                                         />
-                                                        <i className="bi bi-check-circle-fill text-success cursor-pointer fs-5" onClick={() => handleSaveOptionEdit(question.id, option.id)}></i>
-                                                        <i className="bi bi-x-circle-fill text-danger cursor-pointer fs-5" onClick={() => setEditingOptionId(null)}></i>
+                                                        <i className="bi bi-check-lg text-success cursor-pointer fs-5 me-2" onClick={() => handleSaveOptionEdit(question.id, option.id)}></i>
+                                                        <i className="bi bi-x-lg text-danger cursor-pointer fs-6 me-2" onClick={() => setEditingOptionId(null)}></i>
                                                     </div>
                                                 ) : (
                                                     <span className={`fs-6 ${option.isCorrect ? 'fw-bold text-dark' : 'text-secondary'}`}>{option.text}</span>
@@ -311,7 +376,7 @@ const QuizManagementPage: React.FC = () => {
                                             </div>
 
                                             <div className="d-flex gap-1">
-                                                <button className="btn-icon-indigo" onClick={() => handleStartEditingOption(option)} disabled={editingOptionId === option.id}>
+                                                <button className="btn-icon-indigo" onClick={() => { setEditingOptionId(option.id); setEditingText(option.text); setEditingIsCorrect(option.isCorrect); }} disabled={editingOptionId === option.id}>
                                                     <i className="bi bi-pencil-square"></i>
                                                 </button>
                                                 <button className="btn-icon-danger" onClick={() => handleDeleteOption(question.id, option.id)}>
@@ -322,20 +387,28 @@ const QuizManagementPage: React.FC = () => {
                                     ))}
                                     
                                     {addingOptionToQuestion === question.id ? (
-                                        <div className="mt-3 p-3 rounded-4 border-2 border-dashed bg-white d-flex gap-2 animate-fade-in">
+                                        <div className="mt-3 p-3 rounded-4 border-2 border-dashed bg-white d-flex align-items-center gap-3 animate-fade-in shadow-sm">
+                                            <Form.Check 
+                                                type="switch"
+                                                id={`correct-switch-${question.id}`}
+                                                label="Correct?"
+                                                className="small-switch"
+                                                checked={newOptionIsCorrect}
+                                                onChange={(e) => setNewOptionIsCorrect(e.target.checked)}
+                                            />
                                             <Form.Control 
                                                 autoFocus
                                                 placeholder="Type your new option here..." 
                                                 value={newOptionText}
                                                 onChange={(e) => setNewOptionText(e.target.value)}
                                                 onKeyDown={(e) => e.key === 'Enter' && submitNewOption(question.id)}
-                                                className="border-0 bg-light shadow-none"
+                                                className="border-0 bg-light shadow-none flex-grow-1"
                                             />
                                             <Button size="sm" variant="primary" className="fw-bold px-3" onClick={() => submitNewOption(question.id)}>Save</Button>
                                             <Button size="sm" variant="light" onClick={() => setAddingOptionToQuestion(null)}>✕</Button>
                                         </div>
                                     ) : (
-                                        <Button variant="link" className="text-primary text-decoration-none small fw-bold p-0 mt-3 d-inline-flex align-items-center gap-2 hover-shift" onClick={() => handleStartAddingOption(question.id)}>
+                                        <Button variant="link" className="text-primary text-decoration-none small fw-bold p-0 mt-3 d-inline-flex align-items-center gap-2 hover-shift" onClick={() => { setAddingOptionToQuestion(question.id); setNewOptionText(''); setNewOptionIsCorrect(false); }}>
                                             <div className="rounded-circle bg-primary-soft d-flex align-items-center justify-content-center" style={{ width: '24px', height: '24px' }}>
                                                 <i className="bi bi-plus"></i>
                                             </div>
@@ -348,7 +421,7 @@ const QuizManagementPage: React.FC = () => {
                                     <span className="text-secondary small fw-bold cursor-pointer hover-text-danger" onClick={() => handleDeleteQuestion(question.id)}>
                                         <i className="bi bi-trash me-1"></i> Delete Question
                                     </span>
-                                    <Button variant="success" className="rounded-3 px-4 py-2 fw-bold shadow-sm" onClick={() => toast.success("Question changes saved!")}>Save Question</Button>
+                                    <Button variant="success" className="rounded-3 px-4 py-2 fw-bold shadow-sm" onClick={() => toast.success("Question context saved!")}>Save Question</Button>
                                 </div>
                             </Card.Body>
                         </Card>
@@ -384,6 +457,7 @@ const QuizManagementPage: React.FC = () => {
                 .btn-icon-danger:hover { background: #ef4444; color: #fff; }
                 .hover-shift:hover { transform: translateX(5px); transition: transform 0.2s; }
                 .scale-110 { transform: scale(1.1); }
+                .small-switch .form-check-label { font-size: 0.75rem; font-weight: 600; color: #64748b; }
             `}</style>
         </DashboardLayout>
     );

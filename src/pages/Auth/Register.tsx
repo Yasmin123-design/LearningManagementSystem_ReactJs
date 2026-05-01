@@ -1,19 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 import { register } from '../../features/auth/authSlice';
 import type { AppDispatch, RootState } from '../../app/store';
 import AuthLayout from '../../layouts/Auth/AuthLayout';
+import { useForm } from '../../hooks/useForm';
 
 const Register: React.FC = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [role, setRole] = useState('student');
-
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { loading, error, token, user } = useSelector((state: RootState) => state.auth);
+
+    const { values, handleChange, handleSubmit } = useForm({
+        initialValues: {
+            email: '',
+            password: '',
+            role: 'student'
+        },
+        onSubmit: (formValues) => {
+            if (formValues.email && formValues.password && formValues.role) {
+                dispatch(register(formValues));
+            }
+        }
+    });
 
     useEffect(() => {
         if (token && user) {
@@ -24,13 +34,6 @@ const Register: React.FC = () => {
             }
         }
     }, [token, user, navigate]);
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (email && password && role) {
-            dispatch(register({ email, password, role }));
-        }
-    };
 
     return (
         <AuthLayout>
@@ -48,8 +51,9 @@ const Register: React.FC = () => {
                     <Form.Group className="mb-4" controlId="formBasicRole">
                         <Form.Label style={{ color: '#374151', fontWeight: 500 }} className="fs-sm">Select Role</Form.Label>
                         <Form.Select
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
+                            name="role"
+                            value={values.role}
+                            onChange={handleChange}
                             style={{ borderRadius: '0.5rem', borderColor: '#e5e7eb', boxShadow: 'none', padding: '0.75rem 1rem' }}
                         >
                             <option value="student">Student</option>
@@ -65,9 +69,10 @@ const Register: React.FC = () => {
                             </span>
                             <Form.Control
                                 type="email"
+                                name="email"
                                 placeholder="name@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={values.email}
+                                onChange={handleChange}
                                 className="border-start-0 ps-0"
                                 required
                                 style={{ boxShadow: 'none' }}
@@ -83,9 +88,10 @@ const Register: React.FC = () => {
                             </span>
                             <Form.Control
                                 type="password"
+                                name="password"
                                 placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                value={values.password}
+                                onChange={handleChange}
                                 className="border-start-0 ps-0"
                                 required
                                 style={{ boxShadow: 'none', letterSpacing: '2px' }}

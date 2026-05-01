@@ -24,6 +24,7 @@ import Footer from './components/Footer';
 import { initializeAuth } from './features/auth/authSlice';
 import type { AppDispatch, RootState } from './app/store';
 import { Toaster } from 'react-hot-toast';
+import { useSocketNotifications } from './hooks/useSocketNotifications';
 
 const PageLoader = () => (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-white">
@@ -53,6 +54,8 @@ const RoleBasedRedirect: React.FC = () => {
 const App: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { isInitialized } = useSelector((state: RootState) => state.auth);
+
+  useSocketNotifications();
 
   useEffect(() => {
     dispatch(initializeAuth());

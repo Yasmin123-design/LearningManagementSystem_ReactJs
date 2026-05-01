@@ -10,7 +10,8 @@ import './Courses.css';
 
 const Courses: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { courses, loading: coursesLoading, error: coursesError } = useSelector((state: RootState) => state.courses);
+    const { courses, loading: coursesLoading, error: coursesError, pagination } = useSelector((state: RootState) => state.courses);
+    const [page, setPage] = React.useState(1);
     const { enrollments } = useSelector((state: RootState) => state.enrollments);
     const { user, token } = useSelector((state: RootState) => state.auth);
     
@@ -18,11 +19,16 @@ const Courses: React.FC = () => {
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     useEffect(() => {
-        dispatch(fetchCourses());
+        dispatch(fetchCourses({ page }));
         if (token) {
             dispatch(fetchMyEnrollments());
         }
-    }, [dispatch, token]);
+    }, [dispatch, token, page]);
+
+    const handlePageChange = (newPage: number) => {
+        setPage(newPage);
+        window.scrollTo(0, 0);
+    };
 
     const coursesWithProgress = useMemo(() => {
         return courses.map(course => {
@@ -106,6 +112,37 @@ const Courses: React.FC = () => {
                             <CourseCard course={course as any} />
                         </div>
                     ))}
+                </div>
+            )}
+
+            {pagination && pagination.pageCount > 1 && (
+                <div className="d-flex justify-content-center gap-2 mt-5 mb-4">
+                    <button 
+                        className="btn btn-outline-primary rounded-pill px-4"
+                        disabled={page === 1}
+                        onClick={() => handlePageChange(page - 1)}
+                    >
+                        <i className="bi bi-chevron-left me-2"></i> Previous
+                    </button>
+                    <div className="d-flex align-items-center gap-2 mx-2">
+                        {[...Array(pagination.pageCount)].map((_, i) => (
+                            <button
+                                key={i + 1}
+                                className={`btn rounded-circle p-0 ${page === i + 1 ? 'btn-primary' : 'btn-outline-light text-dark'}`}
+                                style={{ width: '40px', height: '40px' }}
+                                onClick={() => handlePageChange(i + 1)}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                    </div>
+                    <button 
+                        className="btn btn-outline-primary rounded-pill px-4"
+                        disabled={page === pagination.pageCount}
+                        onClick={() => handlePageChange(page + 1)}
+                    >
+                        Next <i className="bi bi-chevron-right ms-2"></i>
+                    </button>
                 </div>
             )}
         </DashboardLayout>
